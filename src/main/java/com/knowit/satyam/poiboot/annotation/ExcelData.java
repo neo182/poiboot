@@ -11,11 +11,14 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface ExcelData {
     boolean headerBold() default true;
+
     boolean headerItalic() default false;
+
     boolean headerUnderline() default false;
 
     /**
      * N.B. Use constants defined in HSSFFont
+     *
      * @return
      */
     String headerFontType() default HSSFFont.FONT_ARIAL;

@@ -1,22 +1,28 @@
 package com.knowit.satyam.poiboot.utils;
 
+import com.knowit.satyam.poiboot.annotation.ExcelColumn;
+import com.knowit.satyam.poiboot.annotation.ExcelData;
+import com.knowit.satyam.poiboot.validator.AnnotationsValidator;
+import com.knowit.satyam.poiboot.validator.ValidationException;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.*;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.List;
 
-
-import com.knowit.satyam.poiboot.annotation.ExcelColumn;
-import com.knowit.satyam.poiboot.annotation.ExcelData;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.usermodel.Cell;
-
 public class ExcelWriter {
-    public static void writeTo(List<? extends Object> list, String fileName) {
+    public static void writeTo(List<? extends Object> list, String fileName) throws ValidationException {
         Object excelDataObject = list.get(0);
+
+        AnnotationsValidator validator = new AnnotationsValidator(excelDataObject.getClass());
+        if (!validator.validate()) {
+            List<String> errors = validator.getErrors();
+            throw new ValidationException(errors);
+        }
 
         List<Field> fieldList = ReflectionUtil.getOrderedFields(excelDataObject);
 
