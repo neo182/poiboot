@@ -3,7 +3,6 @@ package com.knowit.satyam.poiboot.validator;
 import com.knowit.satyam.poiboot.annotation.ExcelColumn;
 import com.knowit.satyam.poiboot.annotation.ExcelData;
 import org.junit.jupiter.api.Test;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -27,6 +26,10 @@ class AnnotationsValidatorTest {
         String name;
     }
 
+    @ExcelData
+    class EmptyClass {
+    }
+
     @Test
     void testValidate_ClassWithoutClassAnnotation() {
         AnnotationsValidator validator = new AnnotationsValidator(ClassWithoutClassAnnotation.class);
@@ -37,6 +40,13 @@ class AnnotationsValidatorTest {
     @Test
     void testValidate_ClassWithoutFieldAnnotation() {
         AnnotationsValidator validator = new AnnotationsValidator(ClassWithoutAnyFieldAnnotation.class);
+        boolean validity = validator.validate();
+        assertThat(validity).isFalse();
+    }
+
+    @Test
+    void testValidate_Empty() {
+        AnnotationsValidator validator = new AnnotationsValidator(EmptyClass.class);
         boolean validity = validator.validate();
         assertThat(validity).isFalse();
     }
@@ -55,7 +65,7 @@ class AnnotationsValidatorTest {
         assertThat(validity).isFalse();
 
         List<String> errors = validator.getErrors();
-        assertThat(!CollectionUtils.isEmpty(errors));
+        assertThat(!errors.isEmpty());
         assertThat(errors.stream().anyMatch(s -> s.equals("No field in Class " + ClassWithoutAnyFieldAnnotation.class.getSimpleName() + " contains @ExcelColumn!")));
     }
 
@@ -65,6 +75,6 @@ class AnnotationsValidatorTest {
         validator.validate();
 
         List<String> errors = validator.getErrors();
-        assertThat(CollectionUtils.isEmpty(errors));
+        assertThat(errors.isEmpty());
     }
 }
